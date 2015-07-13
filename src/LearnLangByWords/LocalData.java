@@ -1,6 +1,8 @@
 package LearnLangByWords;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -11,57 +13,83 @@ import java.util.List;
 
 public class LocalData {
 
-    ArrayList<String> englishWord;
-    ArrayList<String> russianWord;
-    ArrayList<Integer> ratingOfEngWords;
-    ArrayList<Integer> ratingOfRusWords;
+    ArrayList<Word> engrusDict;
 
     public LocalData()
     {
-
+        engrusDict = new ArrayList<Word>();
     }
 
-    public String getEnglishWord(String engWord)
+    protected void AddWord(String engWord, String rusWord, byte rating)
     {
-        for (String s : englishWord)
-        {
-            if (s.equals(engWord))
+            engrusDict.add(new Word(engWord, rusWord, rating));
+    }
+
+    //???????? ?????? ? ????????? ??????????? ?????
+    //?? ??????? ? ????????? ??? ??? ???????? ?? Word.russianWord (ArrayList<String>)
+    public boolean SearchForTranslation(String translationToRussian)
+    {
+            for (Word word : engrusDict)
             {
-                return s;
+                for (String s : word.russianWord)
+                {
+                    if (translationToRussian.equals(s.toLowerCase()))
+                    {
+                        return true;
+                    }
+                }
+            }
+        return false;
+    }
+
+    protected void PrintAllWords()
+    {
+            for (Word w : engrusDict)
+            {
+                System.out.println("Translations of " + w.englishWord + ":");
+                for (String s : w.russianWord)
+                {
+                    System.out.println(s);
+                }
+            }
+    }
+
+    protected String SearchWord(String strToSearch, ArrayList<String> arrToSearch)
+    {
+        for (String s : arrToSearch)
+        {
+            if (strToSearch.equals(s))
+            {
+                return strToSearch;
             }
         }
         return null;
     }
 
-    protected String getRussianWord(String rusWord)
+    protected void SortByRating(ArrayList<Integer> ratingListToSort)
     {
-        for (String s : russianWord)
-        {
-            if (s.equals(rusWord))
-            {
-                return s;
-            }
+        Comparator comparator = Collections.reverseOrder();
+        Collections.sort(ratingListToSort, comparator);
+    }
+
+    /*
+    public static void main(String[] args)
+    {
+        Word word = new Word();
+        word.FillWordData("capture", "??????1", (byte)5);
+        word.FillWordData("capture", "?????????2", (byte) -5);
+
+        System.out.println(word.englishWord);
+        for (String s : word.russianWord) {
+            System.out.println(s);
         }
-        return null;
+        System.out.println(word.rating);
+
+        for (String s : word)
+        {
+            for (String s1:word.russianWord)
+            System.out.println(s);
+        }
     }
-
-    protected void setEnglisWord(String engWord)
-    {
-
-    }
-
-    protected void setRussianWord(String rusWord)
-    {
-
-    }
-
-    protected void SortByRating()
-    {
-
-    }
-
-    public String Search(String strToSearch)
-    {
-        return strToSearch;
-    }
+    */
 }
