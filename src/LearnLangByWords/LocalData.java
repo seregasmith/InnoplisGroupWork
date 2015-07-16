@@ -1,95 +1,173 @@
-package LearnLangByWords;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 /**
  * @author Davlatbek Isroilo
  *         Innopolis University
  *         Summer School 2015
  */
 
+package LearnLangByWords;
+
+import java.util.*;
+
 public class LocalData {
 
-    ArrayList<Word> engrusDict;
+    List<Word> engrusDict;
+    Map<Integer, Word> dictMap;
+    int i = 1;
 
     public LocalData()
     {
-        engrusDict = new ArrayList<Word>();
+        dictMap = new HashMap<>();
+        engrusDict = new ArrayList<>();
     }
 
-    protected void AddWord(String engWord, String rusWord, byte rating)
+    protected void addWord(Integer index, String origWord, String tranWord, byte rating)
     {
-            engrusDict.add(new Word(engWord, rusWord, rating));
+        Word w = new Word(index, origWord, tranWord, rating);
+        engrusDict.add(w);
+        //if (w.originalWord.equals())
+        //engrusDict.add(new Word(index, origWord, tranWord, rating));
     }
 
-    //???????? ?????? ? ????????? ??????????? ?????
-    //?? ??????? ? ????????? ??? ??? ???????? ?? Word.russianWord (ArrayList<String>)
-    public boolean SearchForTranslation(String translationToRussian)
+    protected void addWordWithManyTransl(Integer index, String origWord, ArrayList<String> tranWord, byte rating)
     {
-            for (Word word : engrusDict)
-            {
-                for (String s : word.russianWord)
-                {
-                    if (translationToRussian.equals(s.toLowerCase()))
-                    {
-                        return true;
-                    }
+        for (String s : tranWord)
+        {
+            Word w = new Word(index, origWord, new ArrayList<>(Collections.singletonList(s)), rating);
+            engrusDict.add(w);
+        }
+    }
+
+    // Inserts indexes to key and Word objects to value
+    public void addDictToMap()
+    {
+        for (Word w : engrusDict)
+        {
+            dictMap.put(i, w);
+            i++;
+        }
+    }
+
+    // Searches a map for a Word by index
+    public Word searchInMapByIndex(int inputKey)
+    {
+        if (dictMap.containsKey(inputKey)) {
+            Set<Integer> keys = dictMap.keySet();
+            for (Object key : keys) {
+                if ((int) key == inputKey) {
+                    return dictMap.getOrDefault(inputKey, null);
+                    //System.out.println(dictMap.getOrDefault(2, null).originalWord + " : " + dictMap.getOrDefault(2, null).translationWord);
                 }
             }
+        }
+        return null;
+    }
+
+    // Print map by key-values
+    public void printMap()
+    {
+        Set<Map.Entry<Integer, Word>> set = dictMap.entrySet();
+        for (Map.Entry<Integer, Word> dict : set)
+        {
+            System.out.println("Key: " + dict.getKey());
+            System.out.println("Value: " + dict.getValue().originalWord);
+        }
+    }
+
+    public boolean searchForTranslation(String translation)
+    {
+        for (Word word : engrusDict)
+        {
+            for (String s : word.translationWord)
+            {
+                if (translation.equals(s.toLowerCase()))
+                {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
-    protected void PrintAllWords()
+    public boolean searchForTranslation(String original, String translation)
     {
-            for (Word w : engrusDict)
+        for (Word word : engrusDict)
+        {
+            if (word.originalWord.equals(original))
             {
-                System.out.println("Translations of " + w.englishWord + ":");
-                for (String s : w.russianWord)
+                for (String s : word.translationWord)
                 {
-                    System.out.println(s);
+                    if (s.equals(translation))
+                        return true;
                 }
             }
+        }
+        return false;
     }
 
-    protected String SearchWord(String strToSearch, ArrayList<String> arrToSearch)
+    protected void printAllWords()
+    {
+        for (Word w : engrusDict)
+        {
+            System.out.println("Translations of " + w.originalWord.toUpperCase() + ":");
+            for (String translation : w.translationWord)
+            {
+                System.out.println(translation);
+            }
+            System.out.println("Rating: " + w.rating);
+            System.out.println();
+        }
+    }
+
+    protected void sortByRating()
+    {
+        /*Comparator comparator = new Comparator<Word>()
+        {
+            public int compare(Word v1, Word v2)
+            {
+                return v1.rating.compareTo(v2.rating);
+            }
+        };
+        Collections.sort(engrusDict, comparator);*/
+
+        Comparator<Word> comparator = Collections.reverseOrder();
+        Collections.sort(engrusDict, comparator);
+    }
+
+    protected String searchWord(String strToSearch, ArrayList<String> arrToSearch)
     {
         for (String s : arrToSearch)
         {
-            if (strToSearch.equals(s))
-            {
+            if (strToSearch.equals(s)) {
                 return strToSearch;
             }
         }
         return null;
     }
 
-    protected void SortByRating(ArrayList<Integer> ratingListToSort)
-    {
-        Comparator comparator = Collections.reverseOrder();
-        Collections.sort(ratingListToSort, comparator);
-    }
-
-    /*
     public static void main(String[] args)
     {
-        Word word = new Word();
-        word.FillWordData("capture", "??????1", (byte)5);
-        word.FillWordData("capture", "?????????2", (byte) -5);
+        LocalData ld = new LocalData();
 
-        System.out.println(word.englishWord);
-        for (String s : word.russianWord) {
-            System.out.println(s);
-        }
-        System.out.println(word.rating);
+        ld.engrusDict.add(new Word(1, "complex", new ArrayList<>(Arrays.asList("slozniy", "kompleksniy")), (byte) 3));
+        ld.engrusDict.add(new Word(2, "computer", new ArrayList<>(Arrays.asList("komputer", "vichislitel")), (byte) -5));
+        ld.engrusDict.add(new Word(3, "mouse", "mysh", (byte) 1));
+        ld.printAllWords();
 
-        for (String s : word)
+        ld.addDictToMap();
+        ld.printMap();
+
+        /*ld.dictMap.put(1, ld.engrusDict.get(0));
+        ld.dictMap.put(2, ld.engrusDict.get(1));
+        ld.dictMap.put(3, ld.engrusDict.get(2));*/
+
+        /*for (Map.Entry entry : ld.dictMap.entrySet())
         {
-            for (String s1:word.russianWord)
-            System.out.println(s);
-        }
+            Word w = (Word) entry.getValue();
+            System.out.println(entry.getKey() + " " + w.originalWord);
+        }*/
+
+        // Function searchInMapByIndex()
+        System.out.println(ld.searchInMapByIndex(1).originalWord +
+                ld.searchInMapByIndex(1).translationWord + ld.searchInMapByIndex(1).rating);
     }
-    */
 }
